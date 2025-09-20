@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "pages/api/cron/check-all-jobs.js": {
+      "maxDuration": 300
+    },
+    "pages/api/scrape/check-jobs.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/check-all-jobs?secret=your-cron-secret",
+      "schedule": "0 */2 * * *"
+    }
+  ]
+}
