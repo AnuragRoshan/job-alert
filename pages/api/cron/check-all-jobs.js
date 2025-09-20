@@ -40,7 +40,7 @@ export default async function handler(req, res) {
             );
 
             // Save new jobs to database
-            const savedJobs = await Job.insertMany(
+            await Job.insertMany(
               newJobs.map((job) => ({ ...job, alertId: alert._id }))
             );
 

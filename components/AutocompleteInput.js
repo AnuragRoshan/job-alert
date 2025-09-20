@@ -59,7 +59,7 @@ export default function AutocompleteInput({
     }
   };
 
-  const handleBlur = (e) => {
+  const handleBlur = () => {
     // Delay to allow click events on suggestions
     setTimeout(() => {
       if (!listRef.current?.contains(document.activeElement)) {
