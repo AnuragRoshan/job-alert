@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useRouter } from "next/router";
 import AutocompleteInput from "../components/AutocompleteInput";
 import { getKeywordSuggestions } from "../data/keywords";
+import toast from "react-hot-toast";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import Landing from "./landing";
 import {
   Plus,
   Mail,
@@ -18,9 +21,10 @@ import {
   User,
 } from "lucide-react";
 
-export default function Dashboard() {
+export default function Home() {
   const { data: session, status } = useSession();
-  const router = useRouter();
+
+  // All state declarations must be before any conditional returns
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -42,15 +46,15 @@ export default function Dashboard() {
   useEffect(() => {
     if (status === "loading") return; // Still loading
 
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
-      return;
-    }
-
     if (status === "authenticated" && session) {
       fetchAlerts();
     }
-  }, [status, session, router]);
+  }, [status, session]);
+
+  // Show landing page for non-authenticated users
+  if (status === "unauthenticated") {
+    return <Landing />;
+  }
 
   const fetchAlerts = async () => {
     try {
@@ -75,11 +79,13 @@ export default function Dashboard() {
 
     setCompanyLoading(true);
     try {
-      const response = await fetch(`/api/companies/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `/api/companies/search?q=${encodeURIComponent(query)}`
+      );
       const data = await response.json();
       setCompanySuggestions(data.companies || []);
     } catch (error) {
-      console.error('Company search error:', error);
+      console.error("Company search error:", error);
       setCompanySuggestions([]);
     } finally {
       setCompanyLoading(false);
@@ -94,7 +100,11 @@ export default function Dashboard() {
 
   const handleCompanySelect = (company) => {
     setCompanyInput(company.name);
-    setFormData({ ...formData, company: company.name, website: company.domain });
+    setFormData({
+      ...formData,
+      company: company.name,
+      website: company.domain,
+    });
     setCompanySuggestions([]);
   };
 
@@ -104,16 +114,16 @@ export default function Dashboard() {
     setFormData({ ...formData, keywords: value });
 
     // Get last word being typed for suggestions
-    const words = value.split(',');
+    const words = value.split(",");
     const lastWord = words[words.length - 1].trim();
     const suggestions = getKeywordSuggestions(lastWord);
     setKeywordSuggestions(suggestions);
   };
 
   const handleKeywordSelect = (keyword) => {
-    const words = formData.keywords.split(',');
+    const words = formData.keywords.split(",");
     words[words.length - 1] = keyword;
-    const newValue = words.join(', ').replace(/,\s*$/, '');
+    const newValue = words.join(", ").replace(/,\s*$/, "");
     setKeywordInput(newValue);
     setFormData({ ...formData, keywords: newValue });
     setKeywordSuggestions([]);
@@ -121,6 +131,10 @@ export default function Dashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const toastId = toast.loading(
+      editingId ? "Updating alert..." : "Creating alert..."
+    );
 
     try {
       const url = editingId ? `/api/alerts/${editingId}` : "/api/alerts";
@@ -149,9 +163,21 @@ export default function Dashboard() {
         setKeywordInput("");
         setCompanySuggestions([]);
         setKeywordSuggestions([]);
+
+        toast.success(
+          editingId
+            ? "Alert updated successfully!"
+            : "Alert created successfully! You'll receive job notifications soon.",
+          { id: toastId, duration: 5000 }
+        );
+      } else {
+        toast.error(data.error || "Failed to save alert. Please try again.", {
+          id: toastId,
+        });
       }
     } catch (error) {
       console.error("Error saving alert:", error);
+      toast.error("An error occurred. Please try again.", { id: toastId });
     }
   };
 
@@ -173,22 +199,32 @@ export default function Dashboard() {
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this alert?")) {
+      const toastId = toast.loading("Deleting alert...");
+
       try {
         const response = await fetch(`/api/alerts/${id}`, {
           method: "DELETE",
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (data.success) {
           await fetchAlerts();
+          toast.success("Alert deleted successfully!", { id: toastId });
+        } else {
+          toast.error(data.error || "Failed to delete alert.", { id: toastId });
         }
       } catch (error) {
         console.error("Error deleting alert:", error);
+        toast.error("An error occurred while deleting.", { id: toastId });
       }
     }
   };
 
   const testAlert = async (alertId) => {
     setTestingAlert(alertId);
+    const toastId = toast.loading("Testing alert...");
+
     try {
       const response = await fetch("/api/scrape/check-jobs", {
         method: "POST",
@@ -199,12 +235,15 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
-        alert(`Found ${data.jobsFound} jobs for ${data.company}!`);
+        toast.success(
+          `Test successful! Found ${data.jobsFound} jobs for ${data.company}.`,
+          { id: toastId, duration: 6000 }
+        );
       } else {
-        alert("Error testing alert: " + data.error);
+        toast.error(`Test failed: ${data.error}`, { id: toastId });
       }
     } catch (error) {
-      alert("Error testing alert: " + error.message);
+      toast.error(`Test error: ${error.message}`, { id: toastId });
     } finally {
       setTestingAlert(null);
     }
@@ -232,81 +271,20 @@ export default function Dashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {status === "loading" ? "Checking authentication..." : "Loading your job alerts..."}
+            {status === "loading"
+              ? "Checking authentication..."
+              : "Loading your job alerts..."}
           </p>
         </div>
       </div>
     );
   }
 
-  if (status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <Bell className="inline-block text-blue-600 mb-4" size={48} />
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Authentication Required</h1>
-          <p className="text-gray-600 mb-6">Please sign in to access your job alerts.</p>
-          <button
-            onClick={() => signIn()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex justify-between items-start mb-12">
-          <div className="text-center flex-1">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">
-              <Bell className="inline-block mr-3 text-blue-600" size={40} />
-              Job Alert Platform
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Get notified instantly when your dream companies post new jobs
-            </p>
-          </div>
-
-          {/* User Profile Section */}
-          {session && (
-            <div className="bg-white rounded-lg shadow-lg p-4 min-w-[250px]">
-              <div className="flex items-center gap-3 mb-3">
-                {session.user.image ? (
-                  <img
-                    src={session.user.image}
-                    alt={session.user.name}
-                    className="w-10 h-10 rounded-full"
-                  />
-                ) : (
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
-                )}
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800 text-sm">{session.user.name}</p>
-                  <p className="text-gray-500 text-xs">{session.user.email}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500 capitalize">
-                  {session.provider} Account
-                </span>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-                  className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors flex items-center gap-1"
-                >
-                  <LogOut size={12} />
-                  Sign Out
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -369,11 +347,13 @@ export default function Dashboard() {
                             alt={`${company.name} logo`}
                             className="w-6 h-6 rounded"
                             onError={(e) => {
-                              e.target.style.display = 'none';
+                              e.target.style.display = "none";
                             }}
                           />
                           <span className="text-gray-900">{company.name}</span>
-                          <span className="text-gray-500 text-sm">{company.domain}</span>
+                          <span className="text-gray-500 text-sm">
+                            {company.domain}
+                          </span>
                         </div>
                       )}
                       className="border-gray-300"
@@ -654,6 +634,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

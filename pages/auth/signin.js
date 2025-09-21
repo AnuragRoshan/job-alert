@@ -2,6 +2,7 @@ import { getProviders, signIn, getSession } from "next-auth/react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import { Mail, Users, ArrowRight, Shield, Bell } from "lucide-react"
+import toast from "react-hot-toast"
 
 export default function SignIn({ providers }) {
   const [loading, setLoading] = useState(null)
@@ -19,9 +20,16 @@ export default function SignIn({ providers }) {
   const handleSignIn = async (providerId) => {
     setLoading(providerId)
     try {
-      await signIn(providerId, { callbackUrl: '/' })
+      toast.loading('Signing you in...', { id: 'signin' })
+      const result = await signIn(providerId, { callbackUrl: '/' })
+      if (result?.error) {
+        toast.error('Sign in failed. Please try again.', { id: 'signin' })
+      } else {
+        toast.success('Sign in successful! Redirecting...', { id: 'signin' })
+      }
     } catch (error) {
       console.error('Sign in error:', error)
+      toast.error('An error occurred during sign in.', { id: 'signin' })
     } finally {
       setLoading(null)
     }
