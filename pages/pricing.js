@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Link from 'next/link';
 import {
   Check,
   X,
@@ -190,7 +191,7 @@ export default function Pricing() {
               Compare Plans
             </h2>
             <p className="text-xl text-gray-600">
-              See what's included in each plan
+              See what&apos;s included in each plan
             </p>
           </div>
 
@@ -281,18 +282,18 @@ export default function Pricing() {
             Join thousands of professionals who have found their dream jobs with JobAlert.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
+            <Link
               href="/auth/signin"
               className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-lg"
             >
               Start Free Trial
-            </a>
-            <a
+            </Link>
+            <Link
               href="/contact"
               className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white hover:text-blue-600 transition-all"
             >
               Contact Sales
-            </a>
+            </Link>
           </div>
         </div>
       </section>

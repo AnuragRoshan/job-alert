@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Link from 'next/link';
 import {
   Users,
   Target,
@@ -112,7 +113,7 @@ export default function About() {
                 </span>
               </h1>
               <p className="text-xl text-gray-600 mb-8">
-                We're on a mission to revolutionize how people discover and land their dream jobs.
+                We&apos;re on a mission to revolutionize how people discover and land their dream jobs.
                 Our AI-powered platform has helped over 100,000 professionals find meaningful careers.
               </p>
               <div className="flex flex-wrap gap-6">
@@ -177,7 +178,7 @@ export default function About() {
               Our Journey
             </h2>
             <p className="text-xl text-gray-600">
-              From startup to scale - here's how we've grown
+              From startup to scale - here&apos;s how we&apos;ve grown
             </p>
           </div>
 
@@ -247,7 +248,7 @@ export default function About() {
               Impact by Numbers
             </h2>
             <p className="text-xl text-blue-100">
-              Our platform's growing impact on careers worldwide
+              Our platform&apos;s growing impact on careers worldwide
             </p>
           </div>
 
@@ -279,22 +280,22 @@ export default function About() {
             Join Our Mission
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Whether you're looking for your next opportunity or want to be part of our team,
-            we'd love to hear from you.
+            Whether you&apos;re looking for your next opportunity or want to be part of our team,
+            we&apos;d love to hear from you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
+            <Link
               href="/auth/signin"
               className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
             >
               Get Started Today
-            </a>
-            <a
+            </Link>
+            <Link
               href="/contact"
               className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 transition-all"
             >
               Contact Us
-            </a>
+            </Link>
           </div>
         </div>
       </section>

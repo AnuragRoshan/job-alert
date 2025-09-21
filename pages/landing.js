@@ -172,7 +172,7 @@ export default function Landing() {
               Everything You Need to Land Your Next Role
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Powerful features designed to give you the competitive edge in today's job market
+              Powerful features designed to give you the competitive edge in today&apos;s job market
             </p>
           </div>
 
@@ -252,7 +252,7 @@ export default function Landing() {
                     <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-4">"{testimonial.content}"</p>
+                <p className="text-gray-700 mb-4">&ldquo;{testimonial.content}&rdquo;</p>
                 <div className="flex items-center">
                   <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm mr-3">
                     {testimonial.avatar}

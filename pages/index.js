@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import AutocompleteInput from "../components/AutocompleteInput";
 import { getKeywordSuggestions } from "../data/keywords";
 import toast from "react-hot-toast";
@@ -17,8 +17,6 @@ import {
   AlertCircle,
   CheckCircle,
   Play,
-  LogOut,
-  User,
 } from "lucide-react";
 
 export default function Home() {

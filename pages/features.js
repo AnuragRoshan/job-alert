@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Link from 'next/link';
 import {
   Bell,
   Search,
@@ -193,18 +194,18 @@ export default function Features() {
             Join thousands of professionals who are already using JobAlert to accelerate their careers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
+            <Link
               href="/auth/signin"
               className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-lg"
             >
               Start Free Trial
-            </a>
-            <a
+            </Link>
+            <Link
               href="/pricing"
               className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white hover:text-blue-600 transition-all"
             >
               View Pricing
-            </a>
+            </Link>
           </div>
         </div>
       </section>
